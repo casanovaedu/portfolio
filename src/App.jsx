@@ -257,21 +257,32 @@ export default function App() {
   return (
     <div className="min-h-screen font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white relative">
       
-      {/* Scroll Progress Bar - NEW FEATURE */}
+      {/* Scroll Progress Bar */}
       <div 
-        className="fixed top-0 left-0 h-1.5 bg-zinc-900 z-50 transition-all duration-100 ease-out"
+        className="fixed top-0 left-0 h-1.5 bg-zinc-900 z-50 transition-all duration-150 ease-out shadow-sm"
         style={{ width: `${scrollProgress * 100}%` }}
       />
 
-      {/* Global Background Styling with Dynamic Scroll Reactivity - NEW FEATURE */}
-      <div className="fixed inset-0 -z-10 bg-zinc-100/50 transition-all duration-700 ease-out"
-           style={{
-             backgroundImage: `
-               radial-gradient(at ${50 + scrollY * 0.02}% ${0 + scrollY * 0.05}%, rgba(255,255,255,0.8) 0px, transparent 50%),
-               radial-gradient(at ${100 - scrollY * 0.02}% ${0 + scrollY * 0.03}%, rgba(228, 228, 231, 0.5) 0px, transparent 50%)
-             `
-           }}
-      />
+      {/* Global Background Parallax Blobs (Replaces Gradient for Smoothness) */}
+      <div className="fixed inset-0 -z-10 overflow-hidden bg-zinc-50/50">
+        {/* Blob 1: White Glow - Moves slower */}
+        <div 
+          className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-white blur-3xl opacity-80"
+          style={{ 
+            transform: `translate3d(${scrollY * 0.1}px, ${scrollY * 0.15}px, 0)`,
+            transition: 'transform 0.1s linear' // Using linear + translate3d for smooth gpu sync
+          }}
+        />
+        
+        {/* Blob 2: Zinc Shadow - Moves faster */}
+        <div 
+          className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-zinc-200/50 blur-3xl opacity-60"
+          style={{ 
+            transform: `translate3d(-${scrollY * 0.05}px, ${scrollY * 0.2}px, 0)`,
+            transition: 'transform 0.1s linear'
+          }}
+        />
+      </div>
 
       {/* Navigation */}
       <nav className="max-w-5xl mx-auto px-6 py-6 flex justify-between items-center relative z-10">
