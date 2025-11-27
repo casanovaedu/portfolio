@@ -203,6 +203,23 @@ export default function App() {
   
   const t = translations[lang];
 
+  // Update Tab Title & Icon dynamically on load
+  useEffect(() => {
+    // 1. Set Impactful Title
+    document.title = "Edu Casanova | Revenue Architect"; 
+    
+    // 2. Set Favicon to Planet Emoji (Matches "Space Nerd" in bio)
+    const setFavicon = () => {
+      const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/svg+xml';
+      link.rel = 'icon';
+      // This SVG renders the planet emoji as an icon
+      link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>`;
+      document.getElementsByTagName('head')[0].appendChild(link);
+    };
+    setFavicon();
+  }, []);
+
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isModalOpen) {
