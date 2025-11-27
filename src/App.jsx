@@ -16,7 +16,8 @@ import {
   Terminal,
   Users,
   MessageSquare,
-  Shuffle
+  Shuffle,
+  ArrowUp // Added for the Back to Top button
 } from 'lucide-react';
 
 // --- TRANSLATIONS CONFIGURATION ---
@@ -197,6 +198,8 @@ const TechBadge = ({ icon: Icon, label }) => (
 export default function App() {
   const [lang, setLang] = useState('en');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   
   const t = translations[lang];
 
@@ -209,14 +212,46 @@ export default function App() {
     }
   }, [isModalOpen]);
 
+  // Handle Scroll Effects (Background & Progress Bar)
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+
+      // Calculate progress percentage
+      const totalScroll = document.documentElement.scrollTop;
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = `${totalScroll / windowHeight}`;
+      setScrollProgress(Number(scrolled));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
-    <div className="min-h-screen font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
-      {/* Global Background Styling */}
-      <div className="fixed inset-0 -z-10 bg-zinc-100/50"
+    <div className="min-h-screen font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white relative">
+      
+      {/* Scroll Progress Bar - NEW FEATURE */}
+      <div 
+        className="fixed top-0 left-0 h-1.5 bg-zinc-900 z-50 transition-all duration-100 ease-out"
+        style={{ width: `${scrollProgress * 100}%` }}
+      />
+
+      {/* Global Background Styling with Dynamic Scroll Reactivity - NEW FEATURE */}
+      <div className="fixed inset-0 -z-10 bg-zinc-100/50 transition-all duration-700 ease-out"
            style={{
              backgroundImage: `
-               radial-gradient(at 0% 0%, rgba(255,255,255,0.8) 0px, transparent 50%),
-               radial-gradient(at 100% 0%, rgba(228, 228, 231, 0.5) 0px, transparent 50%)
+               radial-gradient(at ${50 + scrollY * 0.02}% ${0 + scrollY * 0.05}%, rgba(255,255,255,0.8) 0px, transparent 50%),
+               radial-gradient(at ${100 - scrollY * 0.02}% ${0 + scrollY * 0.03}%, rgba(228, 228, 231, 0.5) 0px, transparent 50%)
              `
            }}
       />
@@ -427,6 +462,15 @@ export default function App() {
       <footer className="text-center py-12 text-zinc-400 text-xs font-mono">
         <p>ARCHITECTED BY EDU CASANOVA © 2025</p>
       </footer>
+      
+      {/* Back to Top Button - NEW FEATURE */}
+      <button 
+        onClick={scrollToTop}
+        className={`fixed bottom-8 right-8 bg-zinc-900 text-white p-3 rounded-full shadow-xl transition-all duration-300 z-40 hover:bg-zinc-700 hover:scale-110 ${scrollY > 200 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+        aria-label="Back to top"
+      >
+        <ArrowUp className="w-5 h-5" />
+      </button>
 
       {/* Contact Modal */}
       {isModalOpen && (
