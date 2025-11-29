@@ -29,7 +29,7 @@ const translations = {
     contactBtn: "Contact Me",
     heroBadge: "Operational Strategy",
     heroTitle1: "I turn ambiguity into",
-    heroTitle2: "recurring revenue.",
+    heroTitle2: "scalable operations and recurring revenue.",
     heroDesc1: "I was a pivotal part of Exoticca's evolution into a global Travel-Tech leader. Now, I combine that",
     heroDescBold1: "Operational Strategy",
     heroDesc2: "with",
