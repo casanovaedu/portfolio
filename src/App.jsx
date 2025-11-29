@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mail, 
   Phone, 
@@ -17,7 +17,9 @@ import {
   Users,
   MessageSquare,
   Shuffle,
-  ArrowUp // Added for the Back to Top button
+  ArrowUp,
+  FileText,
+  Rocket // Added for the new CTA section
 } from 'lucide-react';
 
 // --- TRANSLATIONS CONFIGURATION ---
@@ -28,14 +30,15 @@ const translations = {
     heroBadge: "Operational Strategy",
     heroTitle1: "I turn ambiguity into",
     heroTitle2: "recurring revenue.",
-    heroDesc1: "I was a pivotal part of Exoticca's scale-up success. Now, I combine that",
+    heroDesc1: "I was a pivotal part of Exoticca's evolution into a global Travel-Tech leader. Now, I combine that",
     heroDescBold1: "Operational Strategy",
     heroDesc2: "with",
     heroDescBold2: "Financial Rigour",
     heroDesc3: "(ex-PwC) to build",
     heroDescBold3: "scalable engines",
     heroDesc4: "that transform chaos into predictable growth.",
-    portfolioBtn: "Project Portfolio",
+    cvBtn: "Interactive CV",
+    githubBtn: "Code Portfolio",
     metricsTitle: "Revenue & Efficiency Impact",
     metricsBadge: "CONFIRMED METRICS",
     m1Title: "Revenue Impact",
@@ -79,6 +82,9 @@ const translations = {
     skillStakeholder: "Stakeholder Mgmt",
     skillChange: "Change Management",
     skillAI: "Gemini / AI Agents",
+    finalCtaTitle: "Interested in my profile?",
+    finalCtaDesc: "Let's connect and discuss how I can contribute to your team.",
+    finalCtaBtn: "Let's Connect",
     modalTitle: "Initialize Contact",
     modalSubtitle: "Select communication protocol.",
     modalEmail: "Send Email",
@@ -91,14 +97,15 @@ const translations = {
     heroBadge: "Estrategia Operativa",
     heroTitle1: "Convierto la ambigüedad en",
     heroTitle2: "ingresos recurrentes.",
-    heroDesc1: "Fui pieza clave en el éxito de escalado de Exoticca. Ahora, combino esa",
+    heroDesc1: "Fui pieza clave en la consolidación de Exoticca como líder global en Travel-Tech. Ahora, combino esa",
     heroDescBold1: "Visión Operativa",
     heroDesc2: "con",
     heroDescBold2: "Rigor Financiero",
     heroDesc3: "(ex-PwC) para construir",
     heroDescBold3: "motores escalables",
     heroDesc4: "que transforman el caos en crecimiento predecible.",
-    portfolioBtn: "Ver Proyectos",
+    cvBtn: "CV Interactivo",
+    githubBtn: "Portafolio Código",
     metricsTitle: "Impacto en Ingresos y Eficiencia",
     metricsBadge: "MÉTRICAS CONTRASTADAS",
     m1Title: "Impacto en Ingresos",
@@ -142,6 +149,9 @@ const translations = {
     skillStakeholder: "Gestión de Stakeholders",
     skillChange: "Gestión del Cambio",
     skillAI: "Gemini / Agentes IA",
+    finalCtaTitle: "¿Interesado en mi perfil?",
+    finalCtaDesc: "Conectemos y hablemos sobre cómo puedo aportar a tu equipo.",
+    finalCtaBtn: "Conectemos",
     modalTitle: "Iniciar Contacto",
     modalSubtitle: "Elige tu canal preferido.",
     modalEmail: "Enviar Email",
@@ -152,7 +162,7 @@ const translations = {
 
 // --- REUSABLE COMPONENTS ---
 
-const GlassPanel = ({ children, className = "", onClick, href, target }) => {
+const GlassPanel = ({ children, className = "", onClick, href, target, style }) => {
   const baseClasses = `
     backdrop-blur-xl bg-white/65 
     border border-white/40 
@@ -162,14 +172,14 @@ const GlassPanel = ({ children, className = "", onClick, href, target }) => {
   
   if (href) {
     return (
-      <a href={href} target={target} className={`${baseClasses} ${className}`} onClick={onClick}>
+      <a href={href} target={target} className={`${baseClasses} ${className}`} onClick={onClick} style={style}>
         {children}
       </a>
     );
   }
   
   return (
-    <div className={`${baseClasses} ${className}`} onClick={onClick}>
+    <div className={`${baseClasses} ${className}`} onClick={onClick} style={style}>
       {children}
     </div>
   );
@@ -201,19 +211,19 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   
+  // Ref for the Ambiguity section to calculate its parallax position
+  const ambiguityRef = useRef(null);
+  const [ambiguityOffset, setAmbiguityOffset] = useState(0);
+
   const t = translations[lang];
 
   // Update Tab Title & Icon dynamically on load
   useEffect(() => {
-    // 1. Set Impactful Title
     document.title = "Edu Casanova | Revenue Architect"; 
-    
-    // 2. Set Favicon to Planet Emoji (Matches "Space Nerd" in bio)
     const setFavicon = () => {
       const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
       link.type = 'image/svg+xml';
       link.rel = 'icon';
-      // This SVG renders the planet emoji as an icon
       link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪐</text></svg>`;
       document.getElementsByTagName('head')[0].appendChild(link);
     };
@@ -229,17 +239,29 @@ export default function App() {
     }
   }, [isModalOpen]);
 
-  // Handle Scroll Effects (Background & Progress Bar)
+  // Handle Scroll Effects (Background, Progress Bar & Parallax Elements)
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
 
-      // Calculate progress percentage
+      // Progress Bar Calculation
       const totalScroll = document.documentElement.scrollTop;
       const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = `${totalScroll / windowHeight}`;
       setScrollProgress(Number(scrolled));
+
+      // Parallax Calculation for Ambiguity Section
+      // We start moving it once it's somewhat in view
+      if (ambiguityRef.current) {
+        const rect = ambiguityRef.current.getBoundingClientRect();
+        // If element is nearing viewport, start applying a gentle offset
+        // Division by 20 makes it subtle (Apple-like)
+        // We only apply if it's visible to avoid layout jumps
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            setAmbiguityOffset((window.innerHeight - rect.top) * 0.05); 
+        }
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -263,18 +285,15 @@ export default function App() {
         style={{ width: `${scrollProgress * 100}%` }}
       />
 
-      {/* Global Background Parallax Blobs (Replaces Gradient for Smoothness) */}
+      {/* Global Background Parallax Blobs */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-zinc-50/50">
-        {/* Blob 1: White Glow - Moves slower */}
         <div 
           className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] rounded-full bg-white blur-3xl opacity-80"
           style={{ 
             transform: `translate3d(${scrollY * 0.1}px, ${scrollY * 0.15}px, 0)`,
-            transition: 'transform 0.1s linear' // Using linear + translate3d for smooth gpu sync
+            transition: 'transform 0.1s linear' 
           }}
         />
-        
-        {/* Blob 2: Zinc Shadow - Moves faster */}
         <div 
           className="absolute top-[20%] -right-[10%] w-[40vw] h-[40vw] rounded-full bg-zinc-200/50 blur-3xl opacity-60"
           style={{ 
@@ -291,7 +310,6 @@ export default function App() {
         </div>
         
         <div className="flex items-center gap-4">
-          {/* Status Indicator (Desktop) */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/50 border border-zinc-200 rounded-full backdrop-blur-sm">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -302,7 +320,6 @@ export default function App() {
             </span>
           </div>
 
-          {/* Language Toggle */}
           <button 
             onClick={() => setLang(prev => prev === 'en' ? 'es' : 'en')}
             className="bg-white hover:bg-zinc-50 text-zinc-800 px-3 py-1.5 rounded-lg text-lg border border-zinc-200 transition-all shadow-sm hover:shadow flex gap-2 items-center cursor-pointer"
@@ -312,7 +329,6 @@ export default function App() {
             <span className={`transition-all duration-300 ${lang === 'es' ? 'opacity-100 grayscale-0 scale-110' : 'opacity-40 grayscale scale-90'}`}>🇪🇸</span>
           </button>
 
-          {/* Contact Button */}
           <button 
             onClick={() => setIsModalOpen(true)}
             className="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
@@ -342,20 +358,32 @@ export default function App() {
             {t.heroDesc1} <strong className="font-semibold text-zinc-900">{t.heroDescBold1}</strong> {t.heroDesc2} <strong className="font-semibold text-zinc-900">{t.heroDescBold2}</strong> {t.heroDesc3} <strong className="font-semibold text-zinc-900">{t.heroDescBold3}</strong> {t.heroDesc4}
           </p>
           
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+            {/* Notion Link */}
             <GlassPanel 
+              href="https://equal-legume-ef2.notion.site/Edu-Casanova-28de49e6350d806aba98fb45eebd519e" 
+              target="_blank"
+              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+            >
+              <FileText className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
+              <span>{t.cvBtn}</span>
+            </GlassPanel>
+
+             {/* Github Link (Restored) */}
+             <GlassPanel 
               href="https://github.com/casanovaedu" 
               target="_blank"
-              className="px-6 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
             >
               <Github className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
-              <span>{t.portfolioBtn}</span>
+              <span>{t.githubBtn}</span>
             </GlassPanel>
             
+            {/* LinkedIn Link */}
             <GlassPanel 
               href="https://linkedin.com/in/edcasanova" 
               target="_blank"
-              className="px-6 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
             >
               <Linkedin className="w-5 h-5 text-zinc-500 group-hover:text-blue-600 transition-colors" />
               <span>LinkedIn</span>
@@ -383,9 +411,16 @@ export default function App() {
           </div>
         </div>
 
-        {/* Ambiguity Section */}
-        <div className="grid md:grid-cols-2 gap-12 mb-24 items-center">
-          <GlassPanel className="p-8 rounded-3xl relative">
+        {/* Ambiguity Section with Parallax Effect */}
+        <div ref={ambiguityRef} className="grid md:grid-cols-2 gap-12 mb-24 items-center">
+          
+          {/* This panel moves slightly (parallax) based on scroll position */}
+          <GlassPanel 
+            className="p-8 rounded-3xl relative transition-transform duration-75 ease-out"
+            style={{ 
+              transform: `translate3d(0, -${ambiguityOffset}px, 0)` // Negative moves it UP slightly as you scroll down
+            }}
+          >
             <div className="absolute -top-4 -left-4 bg-zinc-900 text-white font-bold px-4 py-2 rounded-lg text-xs tracking-wider shadow-lg transform -rotate-2">
               {t.specialtyBadge}
             </div>
@@ -452,7 +487,7 @@ export default function App() {
         </div>
 
         {/* Automation Stack */}
-        <div className="border-t border-zinc-200 pt-12">
+        <div className="border-t border-zinc-200 pt-12 mb-24">
           <h3 className="text-center text-xs font-bold text-zinc-400 uppercase tracking-[0.2em] mb-10">
             {t.toolkitTitle}
           </h3>
@@ -485,13 +520,30 @@ export default function App() {
           </div>
         </div>
 
+        {/* Final CTA Section - NEW */}
+        <div className="relative rounded-3xl overflow-hidden p-12 text-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-zinc-100 to-white opacity-80 backdrop-blur-md -z-10"></div>
+            <div className="absolute inset-0 border border-white/50 rounded-3xl pointer-events-none"></div>
+            
+            <Rocket className="w-10 h-10 text-zinc-900 mx-auto mb-6" strokeWidth={1.5} />
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">{t.finalCtaTitle}</h2>
+            <p className="text-xl text-zinc-600 mb-8 max-w-2xl mx-auto font-light">{t.finalCtaDesc}</p>
+            
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-zinc-900 hover:bg-zinc-800 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 inline-flex items-center gap-2"
+            >
+              {t.finalCtaBtn} <TrendingUp className="w-4 h-4" />
+            </button>
+        </div>
+
       </main>
 
       <footer className="text-center py-12 text-zinc-400 text-xs font-mono">
         <p>ARCHITECTED BY EDU CASANOVA © 2025</p>
       </footer>
       
-      {/* Back to Top Button - NEW FEATURE */}
+      {/* Back to Top Button */}
       <button 
         onClick={scrollToTop}
         className={`fixed bottom-8 right-8 bg-zinc-900 text-white p-3 rounded-full shadow-xl transition-all duration-300 z-40 hover:bg-zinc-700 hover:scale-110 ${scrollY > 200 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
