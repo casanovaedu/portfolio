@@ -19,7 +19,15 @@ import {
   Shuffle,
   ArrowUp,
   FileText,
-  Rocket
+  Rocket,
+  BrainCircuit,
+  Smartphone,
+  Bot,
+  FileCode,
+  CreditCard,
+  LineChart,
+  Heart,
+  Network
 } from 'lucide-react';
 
 // --- TRANSLATIONS CONFIGURATION ---
@@ -55,8 +63,8 @@ const translations = {
     m6Desc: "Maintained high satisfaction across 45k+ annual trips through continuous feedback loops.",
     specialtyBadge: "MY SPECIALTY",
     ambiguityTitle: "I Thrive in Ambiguity",
-    storyTime: "Story time:",
-    storyText: "I recently watched a support team struggle with disjointed tools, copying data back and forth just to answer a simple query. It wasn't a people problem; it was a design failure. It made me realize: I don’t want to just manage processes; I want to engineer the systems that make work effortless.",
+    storyTime: "Real-world Context:",
+    storyText: "I watched our Operations team struggle to manage bookings with 100+ global partners using scattered emails and spreadsheets. It wasn't a people problem; it was a system failure. I took ownership of this ambiguity and led the Provider Platform product, turning operational chaos into a streamlined, digital ecosystem.",
     spaceNerdStart: "I’m a",
     spaceNerdBold: "Space Nerd",
     spaceNerdEnd: "at heart—I love things that launch. I specialize in projects that start with \"we have no idea how to solve this\" and end with a concrete, automated workflow.",
@@ -72,6 +80,26 @@ const translations = {
     step2Desc: "I design the solution. Whether it's a new operational workflow, a policy change, or a tech integration.",
     step3Title: "3. Revenue Realization",
     step3Desc: "I link it to P&L. If the process improvement doesn't save money or make money, I iterate until it does.",
+    projectsTitle: "Operational Leadership Projects",
+    projectsBadge: "SELECTED HIGHLIGHTS (6 of 20+)",
+    project1Title: "Payment Ecosystem Architecture",
+    project1Desc: "Restructured the PSP landscape for e-commerce, diversifying risk from 1 to 5+ providers. Lowered transaction costs and increased collection rates via internal orchestration.",
+    project1Tags: ["FinOps", "Risk Mgmt", "Cost Eff."],
+    project2Title: "Global Providers Platform",
+    project2Desc: "Product Owner for the booking management system used by 100+ global partners. Enabled booking management at a massive scale without linear headcount growth.",
+    project2Tags: ["Product Owner", "Scale", "B2B"],
+    project3Title: "AI Retention Model",
+    project3Desc: "Leveraged AI to create a model for early identification of dissatisfied customers, triggering automated corrective actions to protect Lifetime Value (LTV).",
+    project3Tags: ["AI Ops", "Retention", "LTV"],
+    project4Title: "Strategic Forecasting & Hiring",
+    project4Desc: "Built the forecasting and hiring plan protocols for 30+ employee operative teams, ensuring capacity aligned perfectly with projected demand curves.",
+    project4Tags: ["Management", "Planning", "HR Ops"],
+    project5Title: "GTM & Advance Sales",
+    project5Desc: "Defined protocols for selling trips +1 year in advance and led GTM initiatives like the B2B LATAM launch, bridging the gap between Product and Marketing.",
+    project5Tags: ["Strategy", "GTM", "Growth"],
+    project6Title: "NPS Ecosystem Revamp",
+    project6Desc: "Redefined the customer feedback loop (digital surveys, CRM flows, partner integration), linking satisfaction performance directly to Customer Lifetime Value.",
+    project6Tags: ["CX Strategy", "Data", "CRM"],
     toolkitTitle: "Strategic & Technical Toolkit",
     skillAudit: "Financial Audit (PwC)",
     skillProcess: "Process Design",
@@ -122,8 +150,8 @@ const translations = {
     m6Desc: "Mantuve altos índices de satisfacción en más de 45k viajes anuales mediante ciclos de feedback continuo.",
     specialtyBadge: "MI ESPECIALIDAD",
     ambiguityTitle: "Me Crezco ante la Ambigüedad",
-    storyTime: "Anécdota rápida:",
-    storyText: "Hace poco vi a un equipo de soporte sufrir con herramientas desconectadas, copiando datos manualmente para responder una duda simple. No era un problema del equipo, era un fallo de diseño. Ahí lo vi claro: No quiero solo gestionar procesos; quiero diseñar los sistemas que hacen que el trabajo fluya sin esfuerzo.",
+    storyTime: "Contexto real:",
+    storyText: "Vi al equipo de Operaciones luchando para gestionar reservas con +100 partners globales usando emails y excels dispersos. No era un problema de personas; era un fallo del sistema. Asumí esa ambigüedad y lideré la Plataforma de Proveedores, convirtiendo el caos operativo en un ecosistema digital optimizado.",
     spaceNerdStart: "Soy un",
     spaceNerdBold: "Fanático del Espacio",
     spaceNerdEnd: "—me apasiona todo lo que despega. Me especializo en proyectos que empiezan con un \"no tenemos ni idea de cómo arreglar esto\" y terminan con un flujo de trabajo automatizado y sólido.",
@@ -139,6 +167,26 @@ const translations = {
     step2Desc: "Diseño la solución. Ya sea un nuevo flujo de trabajo, un cambio de política interna o una integración tecnológica.",
     step3Title: "3. Realización de Ingresos",
     step3Desc: "Lo vinculo a la cuenta de resultados (P&L). Si la mejora del proceso no ahorra dinero o genera ingresos, itero hasta que lo haga.",
+    projectsTitle: "Liderazgo de Proyectos Operativos",
+    projectsBadge: "DESTACADOS (6 de 20+)",
+    project1Title: "Arquitectura de Pagos",
+    project1Desc: "Reestructuré el ecosistema de pagos (e-commerce), diversificando el riesgo de 1 a 5+ proveedores. Reduje costes y aumenté la tasa de cobro mediante orquestación interna.",
+    project1Tags: ["FinOps", "Riesgo", "Eficiencia"],
+    project2Title: "Plataforma de Proveedores",
+    project2Desc: "Product Owner del sistema de gestión de reservas para +100 partners globales. Permití gestionar reservas a escala masiva sin crecimiento lineal de plantilla.",
+    project2Tags: ["Product Owner", "Escalado", "B2B"],
+    project3Title: "Modelo de Retención IA",
+    project3Desc: "Aproveché la IA para crear un modelo de identificación temprana de clientes insatisfechos, activando acciones correctivas automáticas para proteger el LTV.",
+    project3Tags: ["AI Ops", "Retención", "LTV"],
+    project4Title: "Previsión y Staffing",
+    project4Desc: "Construí protocolos de previsión y contratación para equipos operativos de +30 personas, alineando perfectamente la capacidad con la demanda proyectada.",
+    project4Tags: ["Management", "Planificación", "HR Ops"],
+    project5Title: "GTM y Ventas Anticipadas",
+    project5Desc: "Definí protocolos para ventas a +1 año vista y lideré iniciativas GTM como el lanzamiento B2B en LATAM, uniendo Producto y Marketing.",
+    project5Tags: ["Estrategia", "GTM", "Growth"],
+    project6Title: "Ecosistema NPS",
+    project6Desc: "Redefiní el ciclo de feedback (encuestas digitales, flujos CRM, integraciones), vinculando el rendimiento de satisfacción directamente al Lifetime Value.",
+    project6Tags: ["Estrategia CX", "Data", "CRM"],
     toolkitTitle: "Toolkit Estratégico y Técnico",
     skillAudit: "Auditoría Financiera (PwC)",
     skillProcess: "Diseño de Procesos",
@@ -226,6 +274,32 @@ const MetricCard = ({ value, label, desc }) => (
       <p className="text-sm text-zinc-600 leading-relaxed">{desc}</p>
     </div>
   </div>
+);
+
+const ProjectCard = ({ title, desc, tags, icon: Icon, href }) => (
+  <GlassPanel className="p-5 rounded-2xl h-full flex flex-col group hover:bg-white/80 transition-all">
+    <div className="flex justify-between items-start mb-3">
+      <div className="p-2.5 bg-zinc-100 rounded-xl group-hover:bg-zinc-900 group-hover:text-white transition-colors duration-300">
+        <Icon className="w-5 h-5" />
+      </div>
+      {href && (
+        <a href={href} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-900 transition-colors">
+          <Github className="w-5 h-5" />
+        </a>
+      )}
+    </div>
+    <h3 className="text-base font-bold text-zinc-900 mb-2">{title}</h3>
+    <p className="text-xs text-zinc-600 mb-4 flex-grow leading-relaxed">
+      {desc}
+    </p>
+    <div className="flex flex-wrap gap-1.5 pt-2 border-t border-zinc-100">
+      {tags.map((tag, i) => (
+        <span key={i} className="text-[9px] font-mono uppercase font-bold text-zinc-500 bg-zinc-100 px-2 py-1 rounded-md">
+          {tag}
+        </span>
+      ))}
+    </div>
+  </GlassPanel>
 );
 
 const TechBadge = ({ icon: Icon, label }) => (
@@ -441,7 +515,72 @@ export default function App() {
           </div>
         </div>
 
-        {/* Ambiguity Section with Parallax Effect */}
+        {/* PROJECTS SECTION (Moved Up) */}
+        <div className="mb-24">
+          <RevealOnScroll>
+            <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+              <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                <BrainCircuit className="w-5 h-5 text-zinc-500" />
+                <span>{t.projectsTitle}</span>
+              </h2>
+              <span className="text-xs text-zinc-400 font-mono">{t.projectsBadge}</span>
+            </div>
+          </RevealOnScroll>
+          
+          {/* Updated grid to 3 columns for density */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <RevealOnScroll delay={100}>
+              <ProjectCard 
+                title={t.project1Title} 
+                desc={t.project1Desc} 
+                tags={t.project1Tags}
+                icon={CreditCard}
+              />
+            </RevealOnScroll>
+            <RevealOnScroll delay={200}>
+              <ProjectCard 
+                title={t.project2Title} 
+                desc={t.project2Desc} 
+                tags={t.project2Tags}
+                icon={Network}
+              />
+            </RevealOnScroll>
+            <RevealOnScroll delay={300}>
+              <ProjectCard 
+                title={t.project3Title} 
+                desc={t.project3Desc} 
+                tags={t.project3Tags}
+                icon={Bot}
+              />
+            </RevealOnScroll>
+            <RevealOnScroll delay={400}>
+              <ProjectCard 
+                title={t.project4Title} 
+                desc={t.project4Desc} 
+                tags={t.project4Tags}
+                icon={LineChart}
+              />
+            </RevealOnScroll>
+            <RevealOnScroll delay={500}>
+              <ProjectCard 
+                title={t.project5Title} 
+                desc={t.project5Desc} 
+                tags={t.project5Tags}
+                icon={Rocket}
+              />
+            </RevealOnScroll>
+            <RevealOnScroll delay={600}>
+              <ProjectCard 
+                title={t.project6Title} 
+                desc={t.project6Desc} 
+                tags={t.project6Tags}
+                icon={Heart}
+              />
+            </RevealOnScroll>
+          </div>
+        </div>
+
+        {/* Ambiguity Section with Parallax Effect (Moved Down) */}
         <div ref={ambiguityRef} className="grid md:grid-cols-2 gap-12 mb-24 items-center">
           
           {/* This panel moves slightly (parallax) based on scroll position */}
