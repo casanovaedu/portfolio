@@ -379,31 +379,30 @@ const TableOfContents = () => {
   ];
 
   return (
-    // Changed hidden xl:flex to lg:flex to show on smaller desktops
-    <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-4 z-50 p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 shadow-sm">
+    <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-5 z-50">
       {navItems.map((item) => (
         <div 
           key={item.id}
           onClick={() => scrollToSection(item.id)}
-          className="group flex items-center gap-3 cursor-pointer relative"
+          className="group flex items-center gap-3 cursor-pointer transition-all duration-300"
         >
-          {/* Label (Always visible on hover or active) */}
-          <span className={`
-            absolute left-6 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest transition-all duration-300 bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm shadow-sm
+          {/* Horizontal Bar Indicator */}
+          <div className={`
+            h-[2px] rounded-full transition-all duration-500 ease-out
             ${activeSection === item.id 
-              ? 'opacity-100 translate-x-0 text-zinc-900' 
-              : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-zinc-500'}
+              ? 'w-8 bg-zinc-900 shadow-[0_0_10px_rgba(0,0,0,0.2)]' 
+              : 'w-3 bg-zinc-300 group-hover:w-5 group-hover:bg-zinc-400'}
+          `}></div>
+          
+          {/* Label */}
+          <span className={`
+            text-[10px] uppercase tracking-widest transition-all duration-500 font-sans
+            ${activeSection === item.id 
+              ? 'text-zinc-900 font-bold opacity-100 translate-x-0' 
+              : 'text-zinc-400 font-medium opacity-40 group-hover:opacity-80 group-hover:translate-x-1'}
           `}>
             {item.label}
           </span>
-
-          {/* Dot Indicator */}
-          <div className={`
-            w-3 h-3 rounded-full transition-all duration-300 border border-white/50 shadow-sm
-            ${activeSection === item.id 
-              ? 'bg-zinc-900 scale-110' 
-              : 'bg-zinc-300 group-hover:bg-zinc-400'}
-          `}></div>
         </div>
       ))}
     </div>
