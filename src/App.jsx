@@ -29,7 +29,9 @@ import {
   Calendar,
   Plane,
   FileText,
-  ArrowUp
+  ArrowUp,
+  Menu, // Imported for potential mobile menu use
+  Hash
 } from 'lucide-react';
 
 // --- TRANSLATIONS CONFIGURATION ---
@@ -251,7 +253,7 @@ const translations = {
     cvRole2: "Operations Analyst - Business Excellence",
     cvCompany2: "Exoticca • Travel Tech Scale-up",
     cvDate2: "May 2022 - Ene 2025",
-    cvDesc2: "Lancé el mercado LATAM desde cero. Transformé la gestión de partners manual en el ecosistema digital 'Global Providers Platform'. Optimicé la compra de vuelos (~900k€ ahorro) y unifiqué Producto con Finanzas.",
+    cvDesc2: "El motor del escalado. Transformé la gestión manual de proveedores en la 'Plataforma Global' digital. Entregué +20 proyectos clave uniendo Producto y Finanzas, incluyendo la optimización de compras de vuelos (~900k€ impacto).",
     
     cvRole3: "Senior Audit Associate",
     cvCompany3: "PwC (PricewaterhouseCoopers)",
@@ -268,10 +270,10 @@ const translations = {
     cvDate5: "2014 - 2018",
     cvDesc5: "Enfoque en Macroeconomía y Dirección Estratégica. Graduado con honores en proyectos de Análisis de Datos.",
 
-    cvRole6: "Data Scientist Professional Certificate",
+    cvRole6: "Certificado Profesional Analista de Datos",
     cvCompany6: "IBM",
     cvDate6: "Mid 2025",
-    cvDesc6: "Profundización en Ciencia de Datos, Python, SQL y Visualización. Refuerzo de capacidades técnicas para impulsar decisiones operativas basadas en datos."
+    cvDesc6: "Profundización en Análisis de Datos, Python, SQL y Visualización. Refuerzo de capacidades técnicas para impulsar decisiones operativas basadas en datos."
   }
 };
 
@@ -331,6 +333,84 @@ const GlassPanel = ({ children, className = "", onClick, href, target, style }) 
     </div>
   );
 };
+
+// --- DYNAMIC TABLE OF CONTENTS (FIXED VISIBILITY) ---
+const TableOfContents = () => {
+  const [activeSection, setActiveSection] = useState('hero');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { 
+        threshold: 0.3, // Lower threshold to catch sections earlier
+        rootMargin: "-10% 0px -50% 0px"
+      }
+    );
+
+    const sections = document.querySelectorAll('section[id]');
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 100,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const navItems = [
+    { id: 'hero', label: 'Intro' },
+    { id: 'impact', label: 'Impact' },
+    { id: 'trajectory', label: 'Timeline' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'philosophy', label: 'Philosophy' },
+    { id: 'toolkit', label: 'Toolkit' }
+  ];
+
+  return (
+    // Changed hidden xl:flex to lg:flex to show on smaller desktops
+    <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-4 z-50 p-4 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 shadow-sm">
+      {navItems.map((item) => (
+        <div 
+          key={item.id}
+          onClick={() => scrollToSection(item.id)}
+          className="group flex items-center gap-3 cursor-pointer relative"
+        >
+          {/* Label (Always visible on hover or active) */}
+          <span className={`
+            absolute left-6 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest transition-all duration-300 bg-white/80 px-2 py-1 rounded-md backdrop-blur-sm shadow-sm
+            ${activeSection === item.id 
+              ? 'opacity-100 translate-x-0 text-zinc-900' 
+              : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-zinc-500'}
+          `}>
+            {item.label}
+          </span>
+
+          {/* Dot Indicator */}
+          <div className={`
+            w-3 h-3 rounded-full transition-all duration-300 border border-white/50 shadow-sm
+            ${activeSection === item.id 
+              ? 'bg-zinc-900 scale-110' 
+              : 'bg-zinc-300 group-hover:bg-zinc-400'}
+          `}></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ... other components ...
 
 const MetricCard = ({ value, label, desc }) => (
   <div className="group relative p-6 rounded-2xl bg-white/50 border border-white/60 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/85 hover:shadow-lg hover:border-white/90 overflow-hidden h-full">
@@ -513,7 +593,7 @@ const TimelineDetailCard = ({ item }) => (
 
 // --- MAIN APP COMPONENT ---
 
-export default function App() {
+const App = () => {
   const [lang, setLang] = useState('en');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -685,6 +765,9 @@ export default function App() {
         style={{ width: `${scrollProgress * 100}%` }}
       />
 
+      {/* Table of Contents - Sidebar */}
+      <TableOfContents />
+
       {/* Global Background Parallax Blobs */}
       <div className="fixed inset-0 -z-10 overflow-hidden bg-zinc-50/50">
         <div 
@@ -741,289 +824,301 @@ export default function App() {
       <main className="max-w-5xl mx-auto px-6 py-12 relative z-0">
         
         {/* Hero Section */}
-        <RevealOnScroll className="max-w-4xl mx-auto text-center mb-24 mt-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase bg-white/50 rounded-full border border-zinc-200 backdrop-blur-md shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>{t.heroBadge}</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-8 tracking-tight text-zinc-900">
-            {t.heroTitle1} <br />
-            <span className="bg-gradient-to-br from-zinc-900 to-zinc-500 bg-clip-text text-transparent">
-              {t.heroTitle2}
-            </span>
-          </h1>
-          
-          <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-3xl mx-auto font-light">
-            {t.heroDesc1} <strong className="font-semibold text-zinc-900">{t.heroDescBold1}</strong> {t.heroDesc2} <strong className="font-semibold text-zinc-900">{t.heroDescBold2}</strong> {t.heroDesc3} <strong className="font-semibold text-zinc-900">{t.heroDescBold3}</strong> {t.heroDesc4}
-          </p>
-          
-          <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-            {/* Notion Link */}
-            <GlassPanel 
-              href="https://equal-legume-ef2.notion.site/Edu-Casanova-28de49e6350d806aba98fb45eebd519e" 
-              target="_blank"
-              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
-            >
-              <FileText className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
-              <span>{t.cvBtn}</span>
-            </GlassPanel>
-
-             {/* Github Link */}
-             <GlassPanel 
-              href="https://github.com/casanovaedu" 
-              target="_blank"
-              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
-            >
-              <Github className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
-              <span>{t.githubBtn}</span>
-            </GlassPanel>
+        <section id="hero">
+          <RevealOnScroll className="max-w-4xl mx-auto text-center mb-24 mt-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase bg-white/50 rounded-full border border-zinc-200 backdrop-blur-md shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>{t.heroBadge}</span>
+            </div>
             
-            {/* LinkedIn Link */}
-            <GlassPanel 
-              href="https://linkedin.com/in/edcasanova" 
-              target="_blank"
-              className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
-            >
-              <Linkedin className="w-5 h-5 text-zinc-500 group-hover:text-blue-600 transition-colors" />
-              <span>LinkedIn</span>
-            </GlassPanel>
-          </div>
-        </RevealOnScroll>
+            <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-8 tracking-tight text-zinc-900">
+              {t.heroTitle1} <br />
+              <span className="bg-gradient-to-br from-zinc-900 to-zinc-500 bg-clip-text text-transparent">
+                {t.heroTitle2}
+              </span>
+            </h1>
+            
+            <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-3xl mx-auto font-light">
+              {t.heroDesc1} <strong className="font-semibold text-zinc-900">{t.heroDescBold1}</strong> {t.heroDesc2} <strong className="font-semibold text-zinc-900">{t.heroDescBold2}</strong> {t.heroDesc3} <strong className="font-semibold text-zinc-900">{t.heroDescBold3}</strong> {t.heroDesc4}
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+              {/* Notion Link */}
+              <GlassPanel 
+                href="https://equal-legume-ef2.notion.site/Edu-Casanova-28de49e6350d806aba98fb45eebd519e" 
+                target="_blank"
+                className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+              >
+                <FileText className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
+                <span>{t.cvBtn}</span>
+              </GlassPanel>
+
+               {/* Github Link */}
+               <GlassPanel 
+                href="https://github.com/casanovaedu" 
+                target="_blank"
+                className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+              >
+                <Github className="w-5 h-5 text-zinc-500 group-hover:text-black transition-colors" />
+                <span>{t.githubBtn}</span>
+              </GlassPanel>
+              
+              {/* LinkedIn Link */}
+              <GlassPanel 
+                href="https://linkedin.com/in/edcasanova" 
+                target="_blank"
+                className="px-5 py-3 rounded-xl font-medium text-zinc-800 hover:bg-white flex items-center gap-2 group cursor-pointer"
+              >
+                <Linkedin className="w-5 h-5 text-zinc-500 group-hover:text-blue-600 transition-colors" />
+                <span>LinkedIn</span>
+              </GlassPanel>
+            </div>
+          </RevealOnScroll>
+        </section>
 
         {/* ROI Dashboard */}
-        <div className="mb-24">
-          <RevealOnScroll>
-            <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
-              <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-zinc-500" />
-                <span>{t.metricsTitle}</span>
-              </h2>
-              <span className="text-xs text-zinc-400 font-mono">{t.metricsBadge}</span>
-            </div>
-          </RevealOnScroll>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <RevealOnScroll delay={100}><MetricCard value="€8M" label={t.m1Title} desc={t.m1Desc} /></RevealOnScroll>
-            <RevealOnScroll delay={200}><MetricCard value="€2.5M" label={t.m2Title} desc={t.m2Desc} /></RevealOnScroll>
-            <RevealOnScroll delay={300}><MetricCard value="25%" label={t.m3Title} desc={t.m3Desc} /></RevealOnScroll>
-            <RevealOnScroll delay={400}><MetricCard value="100+" label={t.m4Title} desc={t.m4Desc} /></RevealOnScroll>
-            <RevealOnScroll delay={500}><MetricCard value="95%" label={t.m5Title} desc={t.m5Desc} /></RevealOnScroll>
-            <RevealOnScroll delay={600}><MetricCard value="40%" label={t.m6Title} desc={t.m6Desc} /></RevealOnScroll>
-          </div>
-        </div>
-
-        {/* NEW: VISUAL HORIZONTAL TIMELINE SECTION */}
-        <div className="mb-24">
-          <RevealOnScroll>
-            <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
-              <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-zinc-500" />
-                <span>{t.timelineTitle}</span>
-              </h2>
-              <span className="text-xs text-zinc-400 font-mono">{t.timelineBadge}</span>
-            </div>
-          </RevealOnScroll>
-
-          <div className="max-w-4xl mx-auto">
-            <RevealOnScroll delay={100}>
-              <HorizontalTimeline 
-                data={timelineData} 
-                activeId={activeTimelineId} 
-                setActiveId={setActiveTimelineId} 
-              />
+        <section id="impact">
+          <div className="mb-24">
+            <RevealOnScroll>
+              <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+                <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-zinc-500" />
+                  <span>{t.metricsTitle}</span>
+                </h2>
+                <span className="text-xs text-zinc-400 font-mono">{t.metricsBadge}</span>
+              </div>
             </RevealOnScroll>
             
-            {/* Detail View for Selected Item */}
-            <RevealOnScroll delay={200}>
-               {activeTimelineItem && (
-                 <div key={activeTimelineItem.id}> 
-                    <TimelineDetailCard item={activeTimelineItem} />
-                 </div>
-               )}
-            </RevealOnScroll>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <RevealOnScroll delay={100}><MetricCard value="€8M" label={t.m1Title} desc={t.m1Desc} /></RevealOnScroll>
+              <RevealOnScroll delay={200}><MetricCard value="€2.5M" label={t.m2Title} desc={t.m2Desc} /></RevealOnScroll>
+              <RevealOnScroll delay={300}><MetricCard value="25%" label={t.m3Title} desc={t.m3Desc} /></RevealOnScroll>
+              <RevealOnScroll delay={400}><MetricCard value="100+" label={t.m4Title} desc={t.m4Desc} /></RevealOnScroll>
+              <RevealOnScroll delay={500}><MetricCard value="95%" label={t.m5Title} desc={t.m5Desc} /></RevealOnScroll>
+              <RevealOnScroll delay={600}><MetricCard value="40%" label={t.m6Title} desc={t.m6Desc} /></RevealOnScroll>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* NEW: VISUAL HORIZONTAL TIMELINE SECTION */}
+        <section id="trajectory">
+          <div className="mb-24">
+            <RevealOnScroll>
+              <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+                <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-zinc-500" />
+                  <span>{t.timelineTitle}</span>
+                </h2>
+                <span className="text-xs text-zinc-400 font-mono">{t.timelineBadge}</span>
+              </div>
+            </RevealOnScroll>
+
+            <div className="max-w-4xl mx-auto">
+              <RevealOnScroll delay={100}>
+                <HorizontalTimeline 
+                  data={timelineData} 
+                  activeId={activeTimelineId} 
+                  setActiveId={setActiveTimelineId} 
+                />
+              </RevealOnScroll>
+              
+              {/* Detail View for Selected Item */}
+              <RevealOnScroll delay={200}>
+                 {activeTimelineItem && (
+                   <div key={activeTimelineItem.id}> 
+                      <TimelineDetailCard item={activeTimelineItem} />
+                   </div>
+                 )}
+              </RevealOnScroll>
+            </div>
+          </div>
+        </section>
 
         {/* PROJECTS SECTION */}
-        <div className="mb-24">
-          <RevealOnScroll>
-            <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
-              <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
-                <BrainCircuit className="w-5 h-5 text-zinc-500" />
-                <span>{t.projectsTitle}</span>
-              </h2>
-              <span className="text-xs text-zinc-400 font-mono">{t.projectsBadge}</span>
+        <section id="projects">
+          <div className="mb-24">
+            <RevealOnScroll>
+              <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+                <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                  <BrainCircuit className="w-5 h-5 text-zinc-500" />
+                  <span>{t.projectsTitle}</span>
+                </h2>
+                <span className="text-xs text-zinc-400 font-mono">{t.projectsBadge}</span>
+              </div>
+            </RevealOnScroll>
+            
+            {/* Updated grid to 3 columns for density */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              <RevealOnScroll delay={100}>
+                <ProjectCard 
+                  title={t.project1Title} 
+                  desc={t.project1Desc} 
+                  tags={t.project1Tags}
+                  icon={CreditCard}
+                />
+              </RevealOnScroll>
+              <RevealOnScroll delay={200}>
+                <ProjectCard 
+                  title={t.project2Title} 
+                  desc={t.project2Desc} 
+                  tags={t.project2Tags}
+                  icon={Network}
+                />
+              </RevealOnScroll>
+              <RevealOnScroll delay={300}>
+                <ProjectCard 
+                  title={t.project3Title} 
+                  desc={t.project3Desc} 
+                  tags={t.project3Tags}
+                  icon={Bot}
+                />
+              </RevealOnScroll>
+              <RevealOnScroll delay={400}>
+                <ProjectCard 
+                  title={t.project4Title} 
+                  desc={t.project4Desc} 
+                  tags={t.project4Tags}
+                  icon={LineChart}
+                />
+              </RevealOnScroll>
+              <RevealOnScroll delay={500}>
+                <ProjectCard 
+                  title={t.project5Title} 
+                  desc={t.project5Desc} 
+                  tags={t.project5Tags}
+                  icon={Rocket}
+                />
+              </RevealOnScroll>
+              <RevealOnScroll delay={600}>
+                <ProjectCard 
+                  title={t.project6Title} 
+                  desc={t.project6Desc} 
+                  tags={t.project6Tags}
+                  icon={Heart}
+                />
+              </RevealOnScroll>
             </div>
-          </RevealOnScroll>
-          
-          {/* Updated grid to 3 columns for density */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            <RevealOnScroll delay={100}>
-              <ProjectCard 
-                title={t.project1Title} 
-                desc={t.project1Desc} 
-                tags={t.project1Tags}
-                icon={CreditCard}
-              />
-            </RevealOnScroll>
-            <RevealOnScroll delay={200}>
-              <ProjectCard 
-                title={t.project2Title} 
-                desc={t.project2Desc} 
-                tags={t.project2Tags}
-                icon={Network}
-              />
-            </RevealOnScroll>
-            <RevealOnScroll delay={300}>
-              <ProjectCard 
-                title={t.project3Title} 
-                desc={t.project3Desc} 
-                tags={t.project3Tags}
-                icon={Bot}
-              />
-            </RevealOnScroll>
-            <RevealOnScroll delay={400}>
-              <ProjectCard 
-                title={t.project4Title} 
-                desc={t.project4Desc} 
-                tags={t.project4Tags}
-                icon={LineChart}
-              />
-            </RevealOnScroll>
-            <RevealOnScroll delay={500}>
-              <ProjectCard 
-                title={t.project5Title} 
-                desc={t.project5Desc} 
-                tags={t.project5Tags}
-                icon={Rocket}
-              />
-            </RevealOnScroll>
-            <RevealOnScroll delay={600}>
-              <ProjectCard 
-                title={t.project6Title} 
-                desc={t.project6Desc} 
-                tags={t.project6Tags}
-                icon={Heart}
-              />
-            </RevealOnScroll>
           </div>
-        </div>
+        </section>
 
         {/* Ambiguity Section with Parallax Effect */}
-        <div ref={ambiguityRef} className="grid md:grid-cols-2 gap-12 mb-24 items-center">
-          
-          {/* This panel moves slightly (parallax) based on scroll position */}
-          <RevealOnScroll>
-            <GlassPanel 
-              className="p-8 rounded-3xl relative transition-transform duration-75 ease-out"
-              style={{ 
-                transform: `translate3d(0, -${ambiguityOffset}px, 0)` // Negative moves it UP slightly as you scroll down
-              }}
-            >
-              <div className="absolute -top-4 -left-4 bg-zinc-900 text-white font-bold px-4 py-2 rounded-lg text-xs tracking-wider shadow-lg transform -rotate-2">
-                {t.specialtyBadge}
-              </div>
-              <h3 className="text-2xl font-bold text-zinc-900 mb-4">{t.ambiguityTitle}</h3>
-              <p className="text-zinc-600 mb-6 leading-relaxed">
-                <strong>{t.storyTime}</strong> 🏃‍♂️ {t.storyText}
-              </p>
-              <p className="text-zinc-600 leading-relaxed mb-6">
-                {t.spaceNerdStart} <strong>{t.spaceNerdBold}</strong> 🪐 {t.spaceNerdEnd}
-              </p>
-              
-              {/* Visual Process Transformation */}
-              <div className="mt-8 flex items-center justify-between bg-white/50 p-4 rounded-xl border border-zinc-200">
-                <div className="text-center">
-                  <div className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{t.diagramInput}</div>
-                  <div className="text-sm font-semibold text-zinc-700">{t.diagramVague}</div>
+        <section id="philosophy">
+          <div ref={ambiguityRef} className="grid md:grid-cols-2 gap-12 mb-24 items-center">
+            
+            {/* This panel moves slightly (parallax) based on scroll position */}
+            <RevealOnScroll>
+              <GlassPanel 
+                className="p-8 rounded-3xl relative transition-transform duration-75 ease-out"
+                style={{ 
+                  transform: `translate3d(0, -${ambiguityOffset}px, 0)` // Negative moves it UP slightly as you scroll down
+                }}
+              >
+                <div className="absolute -top-4 -left-4 bg-zinc-900 text-white font-bold px-4 py-2 rounded-lg text-xs tracking-wider shadow-lg transform -rotate-2">
+                  {t.specialtyBadge}
                 </div>
-                <div className="flex-1 border-t-2 border-dashed border-zinc-300 mx-4 relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-2 text-[10px] text-zinc-400 font-mono">
-                    {t.diagramProcess}
+                <h3 className="text-2xl font-bold text-zinc-900 mb-4">{t.ambiguityTitle}</h3>
+                <p className="text-zinc-600 mb-6 leading-relaxed">
+                  <strong>{t.storyTime}</strong> 🏃‍♂️ {t.storyText}
+                </p>
+                <p className="text-zinc-600 leading-relaxed mb-6">
+                  {t.spaceNerdStart} <strong>{t.spaceNerdBold}</strong> 🪐 {t.spaceNerdEnd}
+                </p>
+                
+                {/* Visual Process Transformation */}
+                <div className="mt-8 flex items-center justify-between bg-white/50 p-4 rounded-xl border border-zinc-200">
+                  <div className="text-center">
+                    <div className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{t.diagramInput}</div>
+                    <div className="text-sm font-semibold text-zinc-700">{t.diagramVague}</div>
+                  </div>
+                  <div className="flex-1 border-t-2 border-dashed border-zinc-300 mx-4 relative">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-2 text-[10px] text-zinc-400 font-mono">
+                      {t.diagramProcess}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{t.diagramOutput}</div>
+                    <div className="text-sm font-bold text-zinc-900">{t.diagramSystem}</div>
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-1">{t.diagramOutput}</div>
-                  <div className="text-sm font-bold text-zinc-900">{t.diagramSystem}</div>
-                </div>
-              </div>
-            </GlassPanel>
-          </RevealOnScroll>
+              </GlassPanel>
+            </RevealOnScroll>
 
-          <div>
-            <RevealOnScroll delay={200}>
-              <h3 className="text-xl font-bold text-zinc-900 mb-6">{t.pipelineTitle}</h3>
-              <div className="space-y-6">
-                <div className="flex gap-4 group">
-                  <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
-                    <Microscope className="w-5 h-5 text-zinc-600" />
+            <div>
+              <RevealOnScroll delay={200}>
+                <h3 className="text-xl font-bold text-zinc-900 mb-6">{t.pipelineTitle}</h3>
+                <div className="space-y-6">
+                  <div className="flex gap-4 group">
+                    <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
+                      <Microscope className="w-5 h-5 text-zinc-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-zinc-900 font-semibold">{t.step1Title}</h4>
+                      <p className="text-sm text-zinc-500 mt-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: t.step1Desc.replace('operational reality', '<strong>operational reality</strong>') }} />
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-zinc-900 font-semibold">{t.step1Title}</h4>
-                    <p className="text-sm text-zinc-500 mt-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: t.step1Desc.replace('operational reality', '<strong>operational reality</strong>') }} />
+                  
+                  <div className="flex gap-4 group">
+                    <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
+                      <Layers className="w-5 h-5 text-zinc-900" />
+                    </div>
+                    <div>
+                      <h4 className="text-zinc-900 font-semibold">{t.step2Title}</h4>
+                      <p className="text-sm text-zinc-500 mt-1 leading-relaxed">{t.step2Desc}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4 group">
+                    <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
+                      <Coins className="w-5 h-5 text-zinc-600" />
+                    </div>
+                    <div>
+                      <h4 className="text-zinc-900 font-semibold">{t.step3Title}</h4>
+                      <p className="text-sm text-zinc-500 mt-1 leading-relaxed">{t.step3Desc}</p>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex gap-4 group">
-                  <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
-                    <Layers className="w-5 h-5 text-zinc-900" />
-                  </div>
-                  <div>
-                    <h4 className="text-zinc-900 font-semibold">{t.step2Title}</h4>
-                    <p className="text-sm text-zinc-500 mt-1 leading-relaxed">{t.step2Desc}</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-4 group">
-                  <div className="mt-1 bg-white border border-zinc-200 p-2 rounded-lg h-fit shadow-sm group-hover:border-zinc-400 transition-colors">
-                    <Coins className="w-5 h-5 text-zinc-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-zinc-900 font-semibold">{t.step3Title}</h4>
-                    <p className="text-sm text-zinc-500 mt-1 leading-relaxed">{t.step3Desc}</p>
-                  </div>
-                </div>
+              </RevealOnScroll>
+            </div>
+          </div>
+        </section>
+
+        {/* Automation Stack */}
+        <section id="toolkit">
+          <div className="border-t border-zinc-200 pt-12 mb-24">
+            <RevealOnScroll>
+              <h3 className="text-center text-xs font-bold text-zinc-400 uppercase tracking-[0.2em] mb-10">
+                {t.toolkitTitle}
+              </h3>
+              <div className="flex flex-wrap justify-center gap-4">
+                <TechBadge icon={Briefcase} label={t.skillAudit} />
+                <TechBadge icon={Shuffle} label={t.skillProcess} />
+                <TechBadge icon={Database} label={t.skillSQL} />
+                <TechBadge icon={BarChart3} label={t.skillBI} />
+                <TechBadge icon={Terminal} label={t.skillPython} />
+                <TechBadge icon={Users} label={t.skillTeam} />
+                <TechBadge icon={MessageSquare} label={t.skillStakeholder} />
+                <TechBadge icon={Globe} label={t.skillChange} />
+                {/* Custom SVG for Figma */}
+                <GlassPanel className="px-5 py-3 rounded-full flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-700">
+                    <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/>
+                  </svg>
+                  <span className="text-sm font-medium text-zinc-700">Figma</span>
+                </GlassPanel>
+                {/* Custom SVG for Jira */}
+                <GlassPanel className="px-5 py-3 rounded-full flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-zinc-700">
+                    <path d="M11.53 2c0 2.4 1.97 4.35 4.35 4.35h1.78v-1.7c0-2.4-1.94-4.35-4.35-4.35h-1.78v1.7zm-2.69 2.35c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7zm-2.61 4.73c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7zm-2.61 4.73c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7z"/>
+                  </svg>
+                  <span className="text-sm font-medium text-zinc-700">Jira</span>
+                </GlassPanel>
+                <TechBadge icon={(props) => (
+                  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 19v2"/><path d="M17 21h2"/></svg>
+                )} label={t.skillAI} />
               </div>
             </RevealOnScroll>
           </div>
-        </div>
-
-        {/* Automation Stack */}
-        <div className="border-t border-zinc-200 pt-12 mb-24">
-          <RevealOnScroll>
-            <h3 className="text-center text-xs font-bold text-zinc-400 uppercase tracking-[0.2em] mb-10">
-              {t.toolkitTitle}
-            </h3>
-            <div className="flex flex-wrap justify-center gap-4">
-              <TechBadge icon={Briefcase} label={t.skillAudit} />
-              <TechBadge icon={Shuffle} label={t.skillProcess} />
-              <TechBadge icon={Database} label={t.skillSQL} />
-              <TechBadge icon={BarChart3} label={t.skillBI} />
-              <TechBadge icon={Terminal} label={t.skillPython} />
-              <TechBadge icon={Users} label={t.skillTeam} />
-              <TechBadge icon={MessageSquare} label={t.skillStakeholder} />
-              <TechBadge icon={Globe} label={t.skillChange} />
-              {/* Custom SVG for Figma */}
-              <GlassPanel className="px-5 py-3 rounded-full flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-700">
-                  <path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/>
-                </svg>
-                <span className="text-sm font-medium text-zinc-700">Figma</span>
-              </GlassPanel>
-              {/* Custom SVG for Jira */}
-              <GlassPanel className="px-5 py-3 rounded-full flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-zinc-700">
-                  <path d="M11.53 2c0 2.4 1.97 4.35 4.35 4.35h1.78v-1.7c0-2.4-1.94-4.35-4.35-4.35h-1.78v1.7zm-2.69 2.35c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7zm-2.61 4.73c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7zm-2.61 4.73c0-2.4 1.94-4.35 4.35-4.35h1.78v1.7c0 2.4-1.97 4.35-4.35 4.35h-1.78v-1.7z"/>
-                </svg>
-                <span className="text-sm font-medium text-zinc-700">Jira</span>
-              </GlassPanel>
-              <TechBadge icon={(props) => (
-                <svg {...props} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M9 5H5"/><path d="M19 19v2"/><path d="M17 21h2"/></svg>
-              )} label={t.skillAI} />
-            </div>
-          </RevealOnScroll>
-        </div>
+        </section>
 
         {/* Final CTA Section */}
         <RevealOnScroll>
@@ -1123,4 +1218,6 @@ export default function App() {
       `}</style>
     </div>
   );
-}
+};
+
+export default App;
