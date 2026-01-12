@@ -30,7 +30,7 @@ import {
   Plane,
   FileText,
   ArrowUp,
-  Menu, // Imported for potential mobile menu use
+  Menu,
   Hash
 } from 'lucide-react';
 
@@ -108,7 +108,7 @@ const translations = {
     skillAudit: "Financial Audit (PwC)",
     skillProcess: "Process Design",
     skillSQL: "SQL & Data Analysis",
-    skillBI: "Looker / BI Dashboards",
+    skillBI: "Looker / Dashboards BI",
     skillPython: "Python (Tech Enabled)",
     skillTeam: "Team Leadership",
     skillStakeholder: "Stakeholder Mgmt",
@@ -379,31 +379,41 @@ const TableOfContents = () => {
   ];
 
   return (
-    <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col gap-5 z-50">
-      {navItems.map((item) => (
-        <div 
-          key={item.id}
-          onClick={() => scrollToSection(item.id)}
-          className="group flex items-center gap-3 cursor-pointer transition-all duration-300"
-        >
-          {/* Horizontal Bar Indicator */}
-          <div className={`
-            h-[2px] rounded-full transition-all duration-500 ease-out
-            ${activeSection === item.id 
-              ? 'w-8 bg-zinc-900 shadow-[0_0_10px_rgba(0,0,0,0.2)]' 
-              : 'w-3 bg-zinc-300 group-hover:w-5 group-hover:bg-zinc-400'}
-          `}></div>
+    <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden lg:flex flex-col z-50">
+      {navItems.map((item, index) => (
+        <React.Fragment key={item.id}>
+          <div 
+            onClick={() => scrollToSection(item.id)}
+            className="group flex items-center gap-3 cursor-pointer transition-all duration-300"
+          >
+            {/* Horizontal Bar Indicator */}
+            <div className={`
+              h-[2px] rounded-full transition-all duration-500 ease-out
+              ${activeSection === item.id 
+                ? 'w-8 bg-zinc-900 shadow-[0_0_10px_rgba(0,0,0,0.2)]' 
+                : 'w-3 bg-zinc-300 group-hover:w-5 group-hover:bg-zinc-400'}
+            `}></div>
+            
+            {/* Label */}
+            <span className={`
+              text-[10px] uppercase tracking-widest transition-all duration-500 font-sans
+              ${activeSection === item.id 
+                ? 'text-zinc-900 font-bold opacity-100 translate-x-0' 
+                : 'text-zinc-400 font-medium opacity-40 group-hover:opacity-80 group-hover:translate-x-1'}
+            `}>
+              {item.label}
+            </span>
+          </div>
           
-          {/* Label */}
-          <span className={`
-            text-[10px] uppercase tracking-widest transition-all duration-500 font-sans
-            ${activeSection === item.id 
-              ? 'text-zinc-900 font-bold opacity-100 translate-x-0' 
-              : 'text-zinc-400 font-medium opacity-40 group-hover:opacity-80 group-hover:translate-x-1'}
-          `}>
-            {item.label}
-          </span>
-        </div>
+          {/* Intermediate Lines - Only if not the last item */}
+          {index < navItems.length - 1 && (
+            <div className="flex flex-col gap-1.5 my-1.5 pl-0.5 opacity-30">
+              <div className="w-1 h-[1px] bg-zinc-400"></div>
+              <div className="w-1 h-[1px] bg-zinc-400"></div>
+              <div className="w-1 h-[1px] bg-zinc-400"></div>
+            </div>
+          )}
+        </React.Fragment>
       ))}
     </div>
   );
