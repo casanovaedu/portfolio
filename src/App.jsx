@@ -17,17 +17,19 @@ import {
   Users,
   MessageSquare,
   Shuffle,
-  ArrowUp,
-  FileText,
   Rocket,
   BrainCircuit,
-  Smartphone,
   Bot,
-  FileCode,
   CreditCard,
   LineChart,
   Heart,
-  Network
+  Network,
+  GraduationCap,
+  Building2,
+  Calendar,
+  Plane,
+  FileText,
+  ArrowUp
 } from 'lucide-react';
 
 // --- TRANSLATIONS CONFIGURATION ---
@@ -117,7 +119,40 @@ const translations = {
     modalSubtitle: "Select communication protocol.",
     modalEmail: "Send Email",
     modalCall: "Call / Text",
-    modalLinkedinSub: "Connect directly"
+    modalLinkedinSub: "Connect directly",
+    // Timeline Translations
+    timelineTitle: "Professional Trajectory",
+    timelineBadge: "EXPERIENCE & EDUCATION",
+    // CV DATA
+    cvRole1: "Operations & Customer Excellence Manager",
+    cvCompany1: "Exoticca • Travel Tech Scale-up",
+    cvDate1: "Jan 2025 - Present",
+    cvDesc1: "Strategic focus on maximizing Customer Lifetime Value (LTV). Business Owner of the Global Provider Platform (100+ partners), enabling scale without headcount growth. Driving the NPS and CRM strategy to increase repetition and loyalty.",
+    
+    cvRole2: "Operations Analyst - Business Excellence",
+    cvCompany2: "Exoticca • Travel Tech Scale-up",
+    cvDate2: "May 2022 - Jan 2025",
+    cvDesc2: "Launched the LATAM market from scratch. Transformed partner management by deploying the digital 'Global Providers Platform'. Optimized flight purchasing (~€900k savings) and bridged the gap between Product and Finance.",
+    
+    cvRole3: "Senior Audit Associate",
+    cvCompany3: "PwC (PricewaterhouseCoopers)",
+    cvDate3: "Sep 2019 - May 2022",
+    cvDesc3: "Built the foundation of financial rigour. Conducted complex audits for multinational clients, analyzing operational risks and validating financial health. Learned to dissect business models and identify value leakage.",
+
+    cvRole4: "MsC in Financial Management",
+    cvCompany4: "Barcelona School of Management",
+    cvDate4: "2018 - 2019",
+    cvDesc4: "Specialized in financial markets, asset valuation, and corporate finance. Developed strong analytical rigour applied to business strategy.",
+
+    cvRole5: "BSc Int. Business Economics",
+    cvCompany5: "Universitat Pompeu Fabra (UPF)",
+    cvDate5: "2014 - 2018",
+    cvDesc5: "Focused on Macroeconomics and Strategic Management. Graduated with honors in Data Analysis projects.",
+
+    cvRole6: "Data Scientist Professional Certificate",
+    cvCompany6: "IBM",
+    cvDate6: "Mid 2025",
+    cvDesc6: "Deep dive into Data Science methodologies, Python, SQL, and Data Visualization. Strengthening technical capabilities to drive data-informed operational decisions."
   },
   es: {
     location: "Barcelona (Híbrido) • Remoto • Disponibilidad para viajar",
@@ -204,7 +239,39 @@ const translations = {
     modalSubtitle: "Elige tu canal preferido.",
     modalEmail: "Enviar Email",
     modalCall: "Llamar / WhatsApp",
-    modalLinkedinSub: "Conectar en LinkedIn"
+    modalLinkedinSub: "Conectar en LinkedIn",
+    // Timeline Translations
+    timelineTitle: "Trayectoria Profesional",
+    timelineBadge: "EXPERIENCIA Y FORMACIÓN",
+    cvRole1: "Operations & Customer Excellence Manager",
+    cvCompany1: "Exoticca • Travel Tech Scale-up",
+    cvDate1: "Ene 2025 - Actualidad",
+    cvDesc1: "Foco estratégico en maximizar el LTV del cliente. Business Owner de la Plataforma Global de Proveedores (+100 partners), permitiendo el escalado sin aumentar headcount. Dirijo la estrategia de NPS y CRM para impulsar la repetición y lealtad.",
+    
+    cvRole2: "Operations Analyst - Business Excellence",
+    cvCompany2: "Exoticca • Travel Tech Scale-up",
+    cvDate2: "May 2022 - Ene 2025",
+    cvDesc2: "Lancé el mercado LATAM desde cero. Transformé la gestión de partners manual en el ecosistema digital 'Global Providers Platform'. Optimicé la compra de vuelos (~900k€ ahorro) y unifiqué Producto con Finanzas.",
+    
+    cvRole3: "Senior Audit Associate",
+    cvCompany3: "PwC (PricewaterhouseCoopers)",
+    cvDate3: "Sep 2019 - May 2022",
+    cvDesc3: "Construí los cimientos del rigor financiero. Realicé auditorías complejas para clientes multinacionales, analizando riesgos operativos y validando la salud financiera. Aprendí a diseccionar modelos de negocio.",
+
+    cvRole4: "MsC in Financial Management",
+    cvCompany4: "Barcelona School of Management",
+    cvDate4: "2018 - 2019",
+    cvDesc4: "Especialización en mercados financieros, valoración de activos y finanzas corporativas. Desarrollo de rigor analítico aplicado a la estrategia empresarial.",
+
+    cvRole5: "BSc Int. Business Economics",
+    cvCompany5: "Universidad Pompeu Fabra (UPF)",
+    cvDate5: "2014 - 2018",
+    cvDesc5: "Enfoque en Macroeconomía y Dirección Estratégica. Graduado con honores en proyectos de Análisis de Datos.",
+
+    cvRole6: "Data Scientist Professional Certificate",
+    cvCompany6: "IBM",
+    cvDate6: "Mid 2025",
+    cvDesc6: "Profundización en Ciencia de Datos, Python, SQL y Visualización. Refuerzo de capacidades técnicas para impulsar decisiones operativas basadas en datos."
   }
 };
 
@@ -309,6 +376,141 @@ const TechBadge = ({ icon: Icon, label }) => (
   </GlassPanel>
 );
 
+// --- GANTT-STYLE TIMELINE COMPONENT (NON-LINEAR) ---
+const HorizontalTimeline = ({ data, activeId, setActiveId }) => {
+  // Config: 2014-2021 takes 25%, 2021-2026 takes 75%
+  // Adjusted to ensure "MSc" section has visibility and recent roles are prominent
+  const pivotYear = 2021;
+  const pivotPercent = 25; // Increased from 15 to 25 to show MSc better
+  const startYear = 2014;
+  const endYear = 2026;
+
+  // Non-linear mapping function
+  const getNonLinearPosition = (year) => {
+    if (year <= pivotYear) {
+      // Map 2014-2021 to 0-25%
+      return ((year - startYear) / (pivotYear - startYear)) * pivotPercent;
+    } else {
+      // Map 2021-2026 to 25-100%
+      return pivotPercent + ((year - pivotYear) / (endYear - pivotYear)) * (100 - pivotPercent);
+    }
+  };
+
+  const getWidth = (start, end) => {
+    return getNonLinearPosition(end) - getNonLinearPosition(start);
+  };
+
+  // Grid Labels to display (aligned with non-linear scale)
+  const gridLabels = [2014, 2021, 2022, 2025, 2026];
+
+  return (
+    <div className="w-full mb-8 select-none relative pt-6 pb-2">
+      {/* Grid Lines & Labels */}
+      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+        {gridLabels.map(year => {
+          const leftPos = getNonLinearPosition(year);
+          return (
+            <div 
+              key={year} 
+              className="absolute top-0 bottom-0 flex flex-col items-center"
+              style={{ left: `${leftPos}%`, transform: 'translateX(-50%)' }}
+            >
+              <div className="h-full w-px bg-zinc-100"></div>
+              <span className="absolute -top-1 text-[10px] font-mono text-zinc-400 bg-white/80 px-1 backdrop-blur-sm">
+                {year === 2026 ? 'Now' : year}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Tracks Container */}
+      <div className="relative h-28 w-full z-10">
+        {data.map((item) => {
+          const left = getNonLinearPosition(item.start);
+          const width = getWidth(item.start, item.end);
+          const isEducation = item.type === 'education';
+          
+          // Education: top, thin. Experience: bottom, thick.
+          const positionClass = isEducation 
+            ? 'top-4 h-6 text-[9px]' 
+            : 'bottom-0 h-16 text-[10px] md:text-xs';
+          
+          return (
+            <div
+              key={item.id}
+              onClick={() => setActiveId(item.id)}
+              className={`
+                absolute rounded-lg flex items-center justify-center cursor-pointer transition-all duration-300 shadow-sm border border-white/50
+                ${positionClass}
+                ${item.colorClass}
+                ${activeId === item.id ? 'z-30 scale-105 shadow-md ring-2 ring-white ring-opacity-50' : 'z-10 hover:opacity-100 opacity-90 hover:scale-[1.02]'}
+              `}
+              style={{ 
+                left: `${left}%`, 
+                width: `${width}%`,
+              }}
+            >
+              {/* Overlap Indicator */}
+              {item.isOverlapping && (
+                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full animate-pulse border border-white" title="Overlapping Period"></div>
+              )}
+
+              <span className={`font-bold uppercase tracking-wider text-white truncate px-1 transition-opacity ${width < 3 ? 'opacity-0' : 'opacity-100'}`}>
+                {item.shortLabel}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      
+      {/* Legend - Updated to Icons instead of confusing color dots */}
+      <div className="flex justify-center gap-8 mt-4 text-[10px] text-zinc-400 font-mono uppercase tracking-widest">
+         <div className="flex items-center gap-2">
+            <GraduationCap className="w-3 h-3 text-zinc-500" /> Education
+         </div>
+         <div className="flex items-center gap-2">
+            <Briefcase className="w-3 h-3 text-zinc-900" /> Experience
+         </div>
+      </div>
+    </div>
+  );
+};
+
+const TimelineDetailCard = ({ item }) => (
+  <GlassPanel className="p-8 rounded-3xl animate-[fadeIn_0.4s_ease-out]">
+    <div className="flex flex-col md:flex-row gap-6 items-start">
+      {/* Icon Box */}
+      <div className={`w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center text-white shadow-xl ${item.iconColor}`}>
+        <item.icon className="w-8 h-8" />
+      </div>
+      
+      {/* Content */}
+      <div className="flex-grow">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-zinc-900">{item.role}</h3>
+            <div className="flex items-center gap-2 text-zinc-500 font-medium text-sm mt-1">
+              <Building2 className="w-4 h-4" />
+              <span>{item.company}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 bg-zinc-100 rounded-full text-zinc-600 font-mono text-xs font-bold">
+            <Calendar className="w-3 h-3" />
+            {item.date}
+          </div>
+        </div>
+        
+        <div className="h-px w-full bg-zinc-100 my-4"></div>
+        
+        <p className="text-zinc-600 leading-relaxed text-base md:text-lg font-light">
+          {item.description}
+        </p>
+      </div>
+    </div>
+  </GlassPanel>
+);
+
 // --- MAIN APP COMPONENT ---
 
 export default function App() {
@@ -317,11 +519,107 @@ export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   
+  // Timeline State
+  const [activeTimelineId, setActiveTimelineId] = useState(1);
+
   // Ref for the Ambiguity section to calculate its parallax position
   const ambiguityRef = useRef(null);
   const [ambiguityOffset, setAmbiguityOffset] = useState(0);
 
   const t = translations[lang];
+
+  // Timeline Data Construction
+  const timelineData = [
+    { 
+      id: 6, // NEW: IBM Data Scientist
+      shortLabel: "IBM Data Sci", 
+      start: 2025.5, // Mid 2025
+      end: 2026.0, 
+      type: 'education',
+      colorClass: "bg-blue-600", // Standout Blue
+      icon: Database,
+      iconColor: "bg-blue-700",
+      role: t.cvRole6,
+      company: t.cvCompany6,
+      date: t.cvDate6,
+      description: t.cvDesc6
+    },
+    { 
+      id: 5, 
+      shortLabel: "BSc", 
+      start: 2014.0,
+      end: 2018.5,
+      type: 'education',
+      colorClass: "bg-zinc-300", // Consistent Grey Scale
+      icon: GraduationCap,
+      iconColor: "bg-zinc-400",
+      role: t.cvRole5,
+      company: t.cvCompany5,
+      date: t.cvDate5,
+      description: t.cvDesc5
+    },
+    { 
+      id: 4, 
+      shortLabel: "MSc", 
+      start: 2018.75, // Sep 2018
+      end: 2020.25, // Overlapping PwC
+      type: 'education',
+      colorClass: "bg-zinc-400", // Consistent Grey Scale
+      icon: GraduationCap,
+      iconColor: "bg-zinc-500",
+      role: t.cvRole4,
+      company: t.cvCompany4,
+      date: t.cvDate4,
+      description: t.cvDesc4,
+      isOverlapping: true
+    },
+    { 
+      id: 3, 
+      shortLabel: "PwC", 
+      start: 2019.75, // Sep 2019
+      end: 2022.35, // May 2022
+      type: 'experience',
+      colorClass: "bg-orange-400", // Brand Color
+      icon: BarChart3,
+      iconColor: "bg-orange-500",
+      role: t.cvRole3,
+      company: t.cvCompany3,
+      date: t.cvDate3,
+      description: t.cvDesc3
+    },
+    { 
+      id: 2, 
+      shortLabel: "Analyst", 
+      start: 2022.35, // May 2022
+      end: 2025.0, // Jan 2025
+      type: 'experience',
+      colorClass: "bg-black rounded-r-none border-r-0", // Joined Exoticca Look
+      group: 'exoticca', 
+      icon: Plane,
+      iconColor: "bg-zinc-800",
+      role: t.cvRole2,
+      company: t.cvCompany2,
+      date: t.cvDate2,
+      description: t.cvDesc2
+    },
+    { 
+      id: 1, 
+      shortLabel: "Ops Manager", 
+      start: 2025.0, // Jan 2025
+      end: 2026.0, // Present
+      type: 'experience',
+      colorClass: "bg-black rounded-l-none border-l-0", // Joined Exoticca Look
+      group: 'exoticca', 
+      icon: TrendingUp,
+      iconColor: "bg-zinc-900",
+      role: t.cvRole1,
+      company: t.cvCompany1,
+      date: t.cvDate1,
+      description: t.cvDesc1
+    }
+  ];
+
+  const activeTimelineItem = timelineData.find(item => item.id === activeTimelineId);
 
   // Update Tab Title & Icon dynamically on load
   useEffect(() => {
@@ -515,7 +813,39 @@ export default function App() {
           </div>
         </div>
 
-        {/* PROJECTS SECTION (Moved Up) */}
+        {/* NEW: VISUAL HORIZONTAL TIMELINE SECTION */}
+        <div className="mb-24">
+          <RevealOnScroll>
+            <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+              <h2 className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-zinc-500" />
+                <span>{t.timelineTitle}</span>
+              </h2>
+              <span className="text-xs text-zinc-400 font-mono">{t.timelineBadge}</span>
+            </div>
+          </RevealOnScroll>
+
+          <div className="max-w-4xl mx-auto">
+            <RevealOnScroll delay={100}>
+              <HorizontalTimeline 
+                data={timelineData} 
+                activeId={activeTimelineId} 
+                setActiveId={setActiveTimelineId} 
+              />
+            </RevealOnScroll>
+            
+            {/* Detail View for Selected Item */}
+            <RevealOnScroll delay={200}>
+               {activeTimelineItem && (
+                 <div key={activeTimelineItem.id}> 
+                    <TimelineDetailCard item={activeTimelineItem} />
+                 </div>
+               )}
+            </RevealOnScroll>
+          </div>
+        </div>
+
+        {/* PROJECTS SECTION */}
         <div className="mb-24">
           <RevealOnScroll>
             <div className="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
@@ -580,7 +910,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Ambiguity Section with Parallax Effect (Moved Down) */}
+        {/* Ambiguity Section with Parallax Effect */}
         <div ref={ambiguityRef} className="grid md:grid-cols-2 gap-12 mb-24 items-center">
           
           {/* This panel moves slightly (parallax) based on scroll position */}
